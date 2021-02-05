@@ -6,6 +6,8 @@ const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
 const app = express();
 
+mongoose.set('useFindAndModify', false);
+
 mongoose.connect('mongodb+srv://silym:robert1929@cluster0.adnys.mongodb.net/sopekocko?retryWrites=true&w=majority',
     { useNewUrlParser: true,
         useUnifiedTopology: true })

@@ -68,4 +68,44 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 exports.likeSauce = (req, res, next) => {
+    const userId = req.body.userId;
+    const like = req.body.like;
+    let message = 'Aucune modification !';
+
+    Sauce.findOne({ _id: req.params.id })
+        .then(sauce => {
+            switch (like) {
+                case 1:
+                    if (sauce.usersLiked.indexOf(userId) === -1) {
+                        sauce.likes += 1;
+                        sauce.usersLiked.push(userId);
+                        message = 'Sauce likée !';
+                    }
+                    break;
+                case -1:
+                    if (sauce.usersDisliked.indexOf(userId) === -1) {
+                        sauce.dislikes += 1;
+                        sauce.usersDisliked.push(userId);
+                        message = 'Sauce dislikée !';
+                    }
+                    break;
+                case 0:
+                    const indexLike = sauce.usersLiked.indexOf(userId);
+                    const indexDislike = sauce.usersDisliked.indexOf(userId);
+                    if (indexLike > -1) {
+                        sauce.likes += -1;
+                        sauce.usersLiked.splice(indexLike, 1);
+                        message = 'Like annulé !';
+                    } else if (indexDislike > -1) {
+                        sauce.dislikes += -1;
+                        sauce.usersDisliked.splice(indexDislike, 1);
+                        message = 'Dislike annulé !';
+                    }
+                    break;
+            }
+            Sauce.findOneAndUpdate({ _id: req.params.id }, { $set: sauce } )
+                .then(() => res.status(200).json({ message: message }))
+                .catch(error => res.status(400).json({ error }));
+        })
+        .catch(error => res.status(500).json({ error }));
 };
