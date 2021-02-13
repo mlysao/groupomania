@@ -1,43 +1,74 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const maskData = require('maskdata');
+const passwordValidator = require('password-validator');
 
 exports.signup = (req, res, next) => {
-    const user = new User({
-        email: bcrypt.hashSync(req.body.email, 10),
-        password: bcrypt.hashSync(req.body.password, 10)
-    });
-    user.save()
-        .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-        .catch(error => res.status(400).json({ error }));
+    let userExist = null;
+    const schema = new passwordValidator();
+    schema.is().min(8);
+    const validPassword = schema.validate(req.body.password);
+
+    if (validPassword) {
+        User.find()
+            .then(users => {
+                for (let i = 0; i < users.length; i++) {
+                    if (bcrypt.compareSync(req.body.email, users[i].email)) {
+                        userExist = users[i];
+                        break;
+                    }
+                }
+
+                if (userExist) {
+                    return res.status(400).json({error: 'Utilisateur déjà existant !'});
+                }
+
+                const user = new User({
+                    email: bcrypt.hashSync(req.body.email, 10),
+                    emailDisplay: maskData.maskEmail2(req.body.email),
+                    password: bcrypt.hashSync(req.body.password, 10)
+                });
+                user.save()
+                    .then(() => res.status(201).json({message: 'Utilisateur créé !'}))
+                    .catch(error => res.status(400).json({error}));
+            })
+    } else {
+        return res.status(400).json({message: 'Le mot de passe doit faire au moins 8 caractères !'});
+    }
 };
 
 exports.login = (req, res, next) => {
-    bcrypt.hash(req.body.email, 10)
-        .then(email => {
-            console.log(email);
-            User.findOne({ email: email })
-                .then(user => {
-                    if (!user) {
-                        return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+    let user = null;
+    User.find()
+        .then(users => {
+            for (let i = 0 ; i < users.length ; i++) {
+                if (bcrypt.compareSync(req.body.email, users[i].email)) {
+                    console.log(users[i]);
+                    user = users[i];
+                    break;
+                }
+            }
+
+            if (!user) {
+                return res.status(401).json({error: 'Utilisateur non trouvé !'});
+            }
+
+            bcrypt.compare(req.body.password, user.password)
+                .then(valid => {
+                    if (!valid) {
+                        return res.status(401).json({error: 'Mot de passe incorrect !'});
                     }
-                    bcrypt.compare(req.body.password, user.password)
-                        .then(valid => {
-                            if (!valid) {
-                                return res.status(401).json({ error: 'Mot de passe incorrect !' });
-                            }
-                            res.status(200).json({
-                                userId: user._id,
-                                token: jwt.sign(
-                                    { userId: user._id },
-                                    'RANDOM_TOKEN_SECRET',
-                                    { expiresIn: '24h' }
-                                )
-                            });
-                        })
-                        .catch(error => res.status(500).json({ error }));
+                    res.status(200).json({
+                        userId: user._id,
+                        token: jwt.sign(
+                            {userId: user._id},
+                            'RANDOM_TOKEN_SECRET',
+                            {expiresIn: '24h'}
+                        )
+                    });
                 })
-                .catch(error => res.status(500).json({ error }));
+                .catch(error => res.status(500).json({error}));
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(500).json({error}));
 };

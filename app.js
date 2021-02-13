@@ -7,13 +7,15 @@ const sauceRoutes = require('./routes/sauce');
 
 const app = express();
 
-mongoose.set('useFindAndModify', false);
+require('dotenv').config();
+const connect = process.env.USER_DB + ':' + process.env.PWD_DB;
 
-mongoose.connect('mongodb+srv://silym:robert1929@cluster0.adnys.mongodb.net/sopekocko?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://' + connect + '@cluster0.adnys.mongodb.net/sopekocko?retryWrites=true&w=majority',
     { useNewUrlParser: true,
         useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
+mongoose.set('useFindAndModify', false);
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
