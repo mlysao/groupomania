@@ -10,7 +10,7 @@ const app = express();
 require('dotenv').config();
 const connect = process.env.USER_DB + ':' + process.env.PWD_DB;
 
-mongoose.connect('mongodb+srv://' + connect + '@cluster0.adnys.mongodb.net/sopekocko?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://' + connect + '@cluster0.adnys.mongodb.net/sopekockodb?retryWrites=true&w=majority',
     { useNewUrlParser: true,
         useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
