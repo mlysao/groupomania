@@ -10,8 +10,8 @@ const app = express();
 require('dotenv').config();
 const dbCreds = {
     dbname: process.env.DB_NAME || 'sopekocko',
-    user: process.env.DB_USER || 'toto',
-    password: process.env.DB_PWD || 'toto',
+    user: process.env.DB_USER || 'demo',
+    password: process.env.DB_PWD || 'demo',
 };
 mongoose.connect(`mongodb+srv://${dbCreds.user}:${dbCreds.password}@cluster0.adnys.mongodb.net/${dbCreds.dbname}?retryWrites=true&w=majority`,
     { useNewUrlParser: true,
@@ -19,7 +19,6 @@ mongoose.connect(`mongodb+srv://${dbCreds.user}:${dbCreds.password}@cluster0.adn
         useFindAndModify: false })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
-// mongoose.set('useFindAndModify', false);
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
