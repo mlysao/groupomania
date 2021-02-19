@@ -8,14 +8,18 @@ const sauceRoutes = require('./routes/sauce');
 const app = express();
 
 require('dotenv').config();
-const connect = process.env.USER_DB + ':' + process.env.PWD_DB;
-
-mongoose.connect('mongodb+srv://' + connect + '@cluster0.adnys.mongodb.net/sopekockodb?retryWrites=true&w=majority',
+const dbCreds = {
+    dbname: process.env.DB_NAME || 'sopekocko',
+    user: process.env.DB_USER || 'toto',
+    password: process.env.DB_PWD || 'toto',
+};
+mongoose.connect(`mongodb+srv://${dbCreds.user}:${dbCreds.password}@cluster0.adnys.mongodb.net/${dbCreds.dbname}?retryWrites=true&w=majority`,
     { useNewUrlParser: true,
-        useUnifiedTopology: true })
+        useUnifiedTopology: true,
+        useFindAndModify: false })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
-mongoose.set('useFindAndModify', false);
+// mongoose.set('useFindAndModify', false);
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
