@@ -6,6 +6,7 @@ const passwordValidator = require('password-validator');
 
 exports.signup = (req, res, next) => {
     const schema = new passwordValidator();
+
     if (schema.is().min(8).validate(req.body.password)) {
         const user = new User({
             email: req.body.email,
