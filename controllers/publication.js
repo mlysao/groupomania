@@ -62,7 +62,15 @@ exports.modifyPublication = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-exports.deletePublication = (req, res, next) => {
+exports.deletePublication = async (req, res, next) => {
+    await Likes.destroy({
+        where: {publication_id: req.params.id}
+    });
+
+    await Dislikes.destroy({
+        where: {publication_id: req.params.id}
+    });
+
     Publication.findOne({
         where: { id: req.params.id }
     })
@@ -79,11 +87,18 @@ exports.deletePublication = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
 };
 
-exports.likePublication = (req, res, next) => {
+exports.likePublication = async (req, res, next) => {
     const userId = req.body.userId;
     const like = req.body.like;
     switch (like) {
         case 1:
+            await Dislikes.destroy({
+                where: {
+                    publication_id: req.params.id,
+                    utilisateur_id: userId
+                }
+            });
+
             Likes.findOne({
                 where: {
                     publication_id: req.params.id,
@@ -92,12 +107,6 @@ exports.likePublication = (req, res, next) => {
             })
                 .then(publication => {
                     if (!publication) {
-                        // Dislikes.delete({
-                        //     where: {
-                        //         publication_id: req.params.id,
-                        //         utilisateur_id: userId
-                        //     }
-                        // });
                         Likes.create({publication_id: req.params.id, utilisateur_id: userId})
                             .then(() => res.status(201).json({message: 'Publication likée +1 !'}))
                             .catch(error => res.status(400).json({error}));
@@ -108,6 +117,13 @@ exports.likePublication = (req, res, next) => {
                 .catch(error => res.status(500).json({ error }));
             break;
         case -1:
+            await Likes.delete({
+                where: {
+                    publication_id: req.params.id,
+                    utilisateur_id: userId
+                }
+            });
+
             Dislikes.findOne({
                 where: {
                     publication_id: req.params.id,
@@ -116,12 +132,6 @@ exports.likePublication = (req, res, next) => {
             })
                 .then(publication => {
                     if (!publication) {
-                        // Likes.delete({
-                        //     where: {
-                        //         publication_id: req.params.id,
-                        //         utilisateur_id: userId
-                        //     }
-                        // });
                         Dislikes.create({publication_id: req.params.id, utilisateur_id: userId})
                             .then(() => res.status(201).json({message: 'Publication dislikée -1 !'}))
                             .catch(error => res.status(400).json({error}));
