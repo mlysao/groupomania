@@ -1,8 +1,12 @@
 const Utilisateur = require('../models/Utilisateur');
+const Publication = require('../models/Publication');
+const Likes = require('../models/Likes');
+const Dislikes = require('../models/Dislikes');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const maskData = require('maskdata');
 const passwordValidator = require('password-validator');
+const Sequelize = require("sequelize");
 
 exports.signup = (req, res, next) => {
     const schema = new passwordValidator();
@@ -42,4 +46,40 @@ exports.login = (req, res, next) => {
                 .catch(error => res.status(500).json({error}));
         })
         .catch(error => res.status(500).json({error}));
+};
+
+exports.delete = async (req, res, next) => {
+    await Likes.destroy({
+        where: {utilisateur_id: req.params.id}
+    });
+
+    await Likes.destroy({
+        where: {
+            publication_id: {
+                [Sequelize.Op.in]: Sequelize.literal(`(select id from publication where utilisateur_id=${req.params.id})`)
+            }
+        }
+    });
+
+    await Dislikes.destroy({
+        where: {utilisateur_id: req.params.id}
+    });
+
+    await Dislikes.destroy({
+        where: {
+            publication_id: {
+                [Sequelize.Op.in]: Sequelize.literal(`(select id from publication where utilisateur_id=${req.params.id})`)
+            }
+        }
+    });
+
+    Publication.destroy({
+        where: {utilisateur_id: req.params.id}
+    });
+
+    Utilisateur.destroy( {
+        where: {id: req.params.id}
+    })
+        .then(() => res.status(200).json({ message: 'Utilisateur supprimé !'}))
+        .catch(error => res.status(400).json({ error }));
 };
