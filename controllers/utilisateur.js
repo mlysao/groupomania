@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const Utilisateur = require('../models/Utilisateur');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const maskData = require('maskdata');
@@ -6,14 +6,8 @@ const passwordValidator = require('password-validator');
 
 exports.signup = (req, res, next) => {
     const schema = new passwordValidator();
-
     if (schema.is().min(8).validate(req.body.password)) {
-        const user = new User({
-            email: req.body.email,
-            emailDisplay: maskData.maskEmail2(req.body.email),
-            password: bcrypt.hashSync(req.body.password, 10)
-        });
-        user.save()
+        Utilisateur.create({email: req.body.email, email_display: maskData.maskEmail2(req.body.email), password: bcrypt.hashSync(req.body.password, 10)})
             .then(() => res.status(201).json({message: 'Utilisateur créé !'}))
             .catch(error => res.status(400).json({error}));
     } else {
@@ -22,21 +16,24 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    User.findOne({email: req.body.email})
-        .then(user => {
-            if (!user) {
+    Utilisateur.findOne({
+        where: {email: req.body.email}
+    })
+        .then(utilisateur => {
+            console.log(utilisateur)
+            if (!utilisateur) {
                 return res.status(401).json({error: 'Utilisateur non trouvé !'});
             }
 
-            bcrypt.compare(req.body.password, user.password)
+            bcrypt.compare(req.body.password, utilisateur.password)
                 .then(valid => {
                     if (!valid) {
                         return res.status(401).json({error: 'Mot de passe incorrect !'});
                     }
                     res.status(200).json({
-                        userId: user._id,
+                        userId: utilisateur.id,
                         token: jwt.sign(
-                            {userId: user._id},
+                            {userId: utilisateur.id},
                             'RANDOM_TOKEN_SECRET',
                             {expiresIn: '24h'}
                         )
