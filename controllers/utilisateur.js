@@ -50,37 +50,42 @@ exports.login = (req, res, next) => {
 };
 
 exports.delete = async (req, res, next) => {
-    await Likes.destroy({
-        where: {utilisateur_id: req.params.id}
-    });
+    // utilisateur peut-être supprimé par lui-même ou par le modérateur uniquement
+    if (req.userData.userId === req.params.id || req.userData.role === 'MODERATEUR') {
+        await Likes.destroy({
+            where: {utilisateur_id: req.params.id}
+        });
 
-    await Likes.destroy({
-        where: {
-            publication_id: {
-                [Sequelize.Op.in]: Sequelize.literal(`(select id from publication where utilisateur_id=${req.params.id})`)
+        await Likes.destroy({
+            where: {
+                publication_id: {
+                    [Sequelize.Op.in]: Sequelize.literal(`(select id from publication where utilisateur_id=${req.params.id})`)
+                }
             }
-        }
-    });
+        });
 
-    await Dislikes.destroy({
-        where: {utilisateur_id: req.params.id}
-    });
+        await Dislikes.destroy({
+            where: {utilisateur_id: req.params.id}
+        });
 
-    await Dislikes.destroy({
-        where: {
-            publication_id: {
-                [Sequelize.Op.in]: Sequelize.literal(`(select id from publication where utilisateur_id=${req.params.id})`)
+        await Dislikes.destroy({
+            where: {
+                publication_id: {
+                    [Sequelize.Op.in]: Sequelize.literal(`(select id from publication where utilisateur_id=${req.params.id})`)
+                }
             }
-        }
-    });
+        });
 
-    Publication.destroy({
-        where: {utilisateur_id: req.params.id}
-    });
+        Publication.destroy({
+            where: {utilisateur_id: req.params.id}
+        });
 
-    Utilisateur.destroy( {
-        where: {id: req.params.id}
-    })
-        .then(() => res.status(200).json({ message: 'Utilisateur supprimé !'}))
-        .catch(error => res.status(400).json({ error }));
+        Utilisateur.destroy( {
+            where: {id: req.params.id}
+        })
+            .then(() => res.status(200).json({ message: 'Utilisateur supprimé !'}))
+            .catch(error => res.status(400).json({ error }));
+    } else {
+        return res.status(401).json({error: 'Utilisateur non accessible à la suppression !'});
+    }
 };
