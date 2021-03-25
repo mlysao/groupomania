@@ -7,7 +7,8 @@ const Utilisateur = sequelize.define(
         id: {type: Sequelize.BIGINT, primaryKey: true, autoIncrement: true},
         email: {type: Sequelize.STRING, allowNull: false, unique: true},
         email_display: {type: Sequelize.STRING, allowNull: false},
-        password: {type: Sequelize.STRING, allowNull: false}
+        password: {type: Sequelize.STRING, allowNull: false},
+        role: {type: Sequelize.STRING, allowNull: false, defaultValue: 'UTILISATEUR'}
     }, {
         freezeTableName: true
     }
