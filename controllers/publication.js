@@ -121,7 +121,7 @@ exports.deletePublication = async (req, res, next) => {
 };
 
 exports.likePublication = async (req, res, next) => {
-    const userId = req.body.userId;
+    const userId = req.userData.userId;
     const like = req.body.like;
     switch (like) {
         case 1:
@@ -150,7 +150,7 @@ exports.likePublication = async (req, res, next) => {
                 .catch(error => res.status(500).json({ error }));
             break;
         case -1:
-            await Likes.delete({
+            await Likes.destroy({
                 where: {
                     publication_id: req.params.id,
                     utilisateur_id: userId
