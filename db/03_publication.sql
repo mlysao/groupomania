@@ -13,6 +13,7 @@ CREATE TABLE publication (
 	description character varying(255) NOT NULL,
     image_url character varying(255) NOT NULL,
 	utilisateur_id bigint NOT NULL,
+	date_publication TIMESTAMP WITH TIME ZONE NOT NULL,
 	modere boolean  DEFAULT false NOT NULL,
 	"createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
 	"updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL

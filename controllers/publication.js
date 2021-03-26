@@ -1,14 +1,17 @@
 const Publication = require('../models/Publication');
+const Commentaire = require('../models/Commentaire');
 const Likes = require('../models/Likes');
 const Dislikes = require('../models/Dislikes');
 const fs = require('fs');
 
 exports.getAllPublication = (req, res, next) => {
-    // moderateur voit toutes les publications
+    // moderateur voit toutes les publications, tous les commentaires
     if (req.userData.role === 'MODERATEUR') {
         Publication.findAll({
+            include: Commentaire,
             order: [
-                ['createdAt', 'DESC'],
+                ['date_publication', 'DESC'],
+                [Commentaire, 'date_publication', 'DESC']
             ]
         }).then(
             (publications) => {
@@ -21,13 +24,20 @@ exports.getAllPublication = (req, res, next) => {
                 });
             }
         );
-        // les autres roles : uniquement les publications modérées
+        // les autres roles : uniquement les publications modérées avec les commentaires modérés
     } else {
         Publication.findAll({
             where: {modere: true},
+            // include: Commentaire,
+            include: [{
+                model: Commentaire,
+                where: {modere: true},
+                required: false
+            }],
             order: [
-                ['createdAt', 'DESC'],
-            ]
+                ['date_publication', 'DESC'],
+                [Commentaire, 'date_publication', 'DESC']
+            ],
         }).then(
             (publications) => {
                 res.status(200).json(publications);
@@ -50,7 +60,7 @@ exports.getOnePublication = (req, res, next) => {
             if (publication.modere || req.userData.role === 'MODERATEUR') {
                 res.status(200).json(publication);
             } else {
-                return res.status(401).json({error: 'Publication non accessible, en attente de modération'});
+                return res.status(401).json({error: 'Publication non accessible, en attente de modération !'});
             }
         }
     ).catch(
@@ -79,16 +89,7 @@ exports.modifyPublication = (req, res, next) => {
         {
             ...JSON.parse(req.body.publication),
             image_url: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : { ...req.body };
-
-    // données jamais modifiables
-    delete publicationObject.id;
-    delete publicationObject.utilisateur_id;
-
-    // seul le modérateur peut modifier cette donnée
-    if (req.userData.role === 'UTILISATEUR') {
-        delete publicationObject.modere;
-    }
+        } : { ...JSON.parse(req.body.publication) };
 
     Publication.update({ ...publicationObject }, {where: { id: req.params.id }})
         .then(() => res.status(200).json({ message: 'Publication modifiée !'}))
@@ -96,26 +97,31 @@ exports.modifyPublication = (req, res, next) => {
 };
 
 exports.deletePublication = async (req, res, next) => {
-    await Likes.destroy({
-        where: {publication_id: req.params.id}
-    });
-
-    await Dislikes.destroy({
-        where: {publication_id: req.params.id}
-    });
-
     Publication.findOne({
         where: { id: req.params.id }
     })
         .then(publication => {
-            const filename = publication.image_url.split('/images/')[1];
-            fs.unlink(`images/${filename}`, () => {
-                Publication.destroy({
-                where: { id: req.params.id }
-            })
-                    .then(() => res.status(200).json({ message: 'Publication supprimée !'}))
-                    .catch(error => res.status(400).json({ error }));
-            });
+            // seul l'utilisateur de la publication ou le moderateur peut delete
+            if (publication.utilisateur_id === req.userData.userId || req.userData.role === 'MODERATEUR') {
+                Likes.destroy({
+                    where: {publication_id: req.params.id}
+                });
+
+                Dislikes.destroy({
+                    where: {publication_id: req.params.id}
+                });
+
+                const filename = publication.image_url.split('/images/')[1];
+                fs.unlink(`images/${filename}`, () => {
+                    Publication.destroy({
+                        where: { id: req.params.id }
+                    })
+                        .then(() => res.status(200).json({ message: 'Publication supprimée !'}))
+                        .catch(error => res.status(400).json({ error }));
+                });
+            } else {
+                return res.status(401).json({error: 'Suppression non autorisée !'});
+            }
         })
         .catch(error => res.status(500).json({ error }));
 };

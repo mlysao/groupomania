@@ -8,6 +8,7 @@ const Publication = sequelize.define(
         id: {type: Sequelize.BIGINT, primaryKey: true, autoIncrement: true},
         description: {type: Sequelize.STRING, allowNull: false},
         image_url: {type: Sequelize.STRING, allowNull: false},
+        date_publication: {type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.NOW},
         modere: {type: Sequelize.BOOLEAN, defaultValue: false},
         utilisateur_id: {
             type: Sequelize.BIGINT,
