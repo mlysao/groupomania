@@ -28,4 +28,4 @@ ALTER TABLE ONLY publication
     ADD CONSTRAINT publication_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY publication
-    ADD CONSTRAINT publication_utilisateur_fk FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id);
+    ADD CONSTRAINT publication_utilisateur_fk FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id) ON DELETE CASCADE;

@@ -14,6 +14,7 @@ CREATE TABLE utilisateur (
     email_display character varying(255) NOT NULL,
     password character varying(255) NOT NULL,
 	role character varying(255) NOT NULL,
+	image_url character varying(255),
 	"createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
 	"updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL	
 );

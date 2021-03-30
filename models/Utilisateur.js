@@ -8,7 +8,8 @@ const Utilisateur = sequelize.define(
         email: {type: Sequelize.STRING, allowNull: false, unique: true},
         email_display: {type: Sequelize.STRING, allowNull: false},
         password: {type: Sequelize.STRING, allowNull: false},
-        role: {type: Sequelize.STRING, allowNull: false, defaultValue: 'UTILISATEUR'}
+        role: {type: Sequelize.STRING, allowNull: false, defaultValue: 'UTILISATEUR'},
+        image_url: {type: Sequelize.STRING}
     }, {
         freezeTableName: true
     }

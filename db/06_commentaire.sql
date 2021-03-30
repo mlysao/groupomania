@@ -28,7 +28,7 @@ ALTER TABLE ONLY commentaire
     ADD CONSTRAINT commentaire_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY commentaire
-    ADD CONSTRAINT commentaire_utilisateur_fk FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id);
+    ADD CONSTRAINT commentaire_utilisateur_fk FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY commentaire
-    ADD CONSTRAINT commentaire_publication_fk FOREIGN KEY (publication_id) REFERENCES publication(id);
+    ADD CONSTRAINT commentaire_publication_fk FOREIGN KEY (publication_id) REFERENCES publication(id) ON DELETE CASCADE;
