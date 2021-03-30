@@ -1,8 +1,9 @@
+## Groupomania backend
+
 - Cloner le repository
-- Créer un .env à partir de env.example
-
-## Base de données Postgresql
-
-- Créer un utilisateur **groupomania**
+- Dans Postgresql, créer un utilisateur **groupomania**
 - Exécuter dans l'ordre les requêtes sql du répertoire **db**
+- Créer un .env à partir de env.example  
+- Exécuter le backend:
+> nodemon start
 
