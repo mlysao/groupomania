@@ -31,7 +31,7 @@ exports.getOnePublication = (req, res, next) => {
 
 exports.createPublication = (req, res, next) => {
     try {
-        const publicationObject = { ...JSON.parse(req.body.publication) };
+        const publicationObject = JSON.parse(req.body.publication);
         Publication.create({
             description: publicationObject.description,
             image_url: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
@@ -47,7 +47,7 @@ exports.createPublication = (req, res, next) => {
 
 exports.modifyPublication = (req, res, next) => {
     try {
-        const publicationObject = { ...JSON.parse(req.body.publication) };
+        const publicationObject = JSON.parse(req.body.publication);
         if (req.file) {
             publicationObject.image_url = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
         }

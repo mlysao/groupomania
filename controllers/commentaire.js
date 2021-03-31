@@ -2,7 +2,7 @@ const Commentaire = require('../models/Commentaire');
 
 exports.createCommentaire = (req, res, next) => {
     try {
-        const commentaireObject = { ...JSON.parse(req.body.commentaire) };
+        const commentaireObject = JSON.parse(req.body.commentaire);
         Commentaire.create({
             contenu: commentaireObject.contenu,
             publication_id: commentaireObject.publication_id,
@@ -17,7 +17,8 @@ exports.createCommentaire = (req, res, next) => {
 
 exports.modifyCommentaire = (req, res, next) => {
     try {
-        const commentaireObject = { ...JSON.parse(req.body.commentaire) };
+        console.log(req.body.commentaire);
+        const commentaireObject = JSON.parse(req.body.commentaire);
         if (req.userData.role !== 'MODERATEUR') {
             delete commentaireObject.modere;
         }
