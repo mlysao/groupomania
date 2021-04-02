@@ -1,5 +1,5 @@
 const Publication = require('../models/Publication');
-const Commentaire = require('../models/Commentaire');
+const Utilisateur = require('../models/Utilisateur');
 const Likes = require('../models/Likes');
 const Dislikes = require('../models/Dislikes');
 const fs = require('fs');
@@ -10,15 +10,14 @@ exports.getAllPublication = (req, res, next) => {
         where = { modere: true };
     }
     Publication.findAll({
+        attributes: { exclude: ['utilisateur_id'] },
         where: where,
         include: [{
-            model: Commentaire,
-            where: where,
-            required: false
+            model: Utilisateur,
+            attributes: ['id', 'email_display', 'image_url', 'role']
         }],
         order: [
-            ['date_publication', 'DESC'],
-            [Commentaire, 'date_publication', 'DESC']
+            ['date_publication', 'DESC']
         ],
     })
         .then((publications) => res.status(200).json(publications))

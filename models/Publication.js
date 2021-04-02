@@ -21,6 +21,6 @@ const Publication = sequelize.define(
 );
 
 Utilisateur.hasMany(Publication, {foreignKey: 'utilisateur_id'});
-Publication.belongsTo(Utilisateur, {foreignKey: 'id'});
+Publication.belongsTo(Utilisateur, {foreignKey: 'utilisateur_id'});
 
 module.exports = Publication;
