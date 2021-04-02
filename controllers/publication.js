@@ -46,7 +46,7 @@ exports.createPublication = (req, res, next) => {
 
 exports.modifyPublication = (req, res, next) => {
     try {
-        const publicationObject = JSON.parse(req.body.publication);
+        const publicationObject = req.body.publication;
         if (req.file) {
             publicationObject.image_url = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
         }
