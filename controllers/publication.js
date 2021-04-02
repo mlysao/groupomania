@@ -3,11 +3,12 @@ const Utilisateur = require('../models/Utilisateur');
 const Likes = require('../models/Likes');
 const Dislikes = require('../models/Dislikes');
 const fs = require('fs');
+const { Op } = require("sequelize");
 
 exports.getAllPublication = (req, res, next) => {
     let where = {};
     if (req.userData.role !== 'MODERATEUR') {
-        where = { modere: true };
+        where = {  [Op.or]: [ {modere: true}, {utilisateur_id: req.userData.userId} ] };
     }
     Publication.findAll({
         attributes: { exclude: ['utilisateur_id'] },
