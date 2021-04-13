@@ -26,9 +26,9 @@ const Commentaire = sequelize.define(
 );
 
 Utilisateur.hasMany(Commentaire, {foreignKey: 'utilisateur_id'});
-Commentaire.belongsTo(Utilisateur, {foreignKey: 'id'});
+Commentaire.belongsTo(Utilisateur, {foreignKey: 'utilisateur_id'});
 
 Publication.hasMany(Commentaire, {foreignKey: 'publication_id'});
-Commentaire.belongsTo(Publication, {foreignKey: 'id'});
+Commentaire.belongsTo(Publication, {foreignKey: 'publication_id'});
 
 module.exports = Commentaire;

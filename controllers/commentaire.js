@@ -1,11 +1,40 @@
 const Commentaire = require('../models/Commentaire');
+const Utilisateur = require('../models/Utilisateur');
+const {Op} = require("sequelize");
+
+exports.getAllCommentaire = (req, res, next) => {
+    let where;
+    if (req.userData.role !== 'MODERATEUR') {
+        where = {
+            publication_id: req.query.publication,
+            [Op.or]: [ {modere: true}, {utilisateur_id: req.userData.userId} ]
+        };
+    } else {
+        where = { publication_id: req.query.publication };
+        if (req.query.modere) {
+            where = { publication_id: req.query.publication, modere: req.query.modere }
+        }
+    }
+
+    Commentaire.findAll({
+        where: where,
+        include: [{
+            model: Utilisateur,
+            attributes: ['id', 'email_display', 'image_url', 'role']
+        }],
+        order: [
+            ['date_publication', 'DESC']
+        ],
+    })
+        .then((commentaires) => res.status(200).json(commentaires))
+        .catch(error => res.status(400).json({ error }));
+};
 
 exports.createCommentaire = (req, res, next) => {
     try {
-        const commentaireObject = JSON.parse(req.body.commentaire);
         Commentaire.create({
-            contenu: commentaireObject.contenu,
-            publication_id: commentaireObject.publication_id,
+            contenu: req.body.contenu,
+            publication_id: req.body.publication_id,
             utilisateur_id: req.userData.userId
         })
             .then(() => res.status(201).json({ message: 'Commentaire enregistré !'}))
@@ -17,12 +46,7 @@ exports.createCommentaire = (req, res, next) => {
 
 exports.modifyCommentaire = (req, res, next) => {
     try {
-        console.log(req.body.commentaire);
-        const commentaireObject = JSON.parse(req.body.commentaire);
-        if (req.userData.role !== 'MODERATEUR') {
-            delete commentaireObject.modere;
-        }
-        Commentaire.update({ commentaireObject }, {where: { id: req.params.id }})
+        Commentaire.update({ modere: true }, {where: { id: req.params.id }})
             .then(() => res.status(200).json({ message: 'Commentaire modifié !'}))
             .catch(error => res.status(400).json({ error }));
     } catch (error) {

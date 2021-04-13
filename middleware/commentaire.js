@@ -3,7 +3,7 @@ const Publication = require('../models/Publication');
 exports.publicationFindById = async (req, res, next) => {
     try {
         req.publication = await Publication.findOne({
-            where: { id: req.body.commentaire.publication_id }
+            where: { id: req.body.publication_id }
         });
     } catch (error) {
         res.status(404).json({ error: 'Publication inexistante !' });
