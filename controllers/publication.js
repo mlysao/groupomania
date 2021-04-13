@@ -136,3 +136,21 @@ exports.likePublication = async (req, res, next) => {
             break;
     }
 };
+
+exports.getLikesByPublication = (req, res, next) => {
+    let where = {};
+    Likes.count({
+        where: { publication_id: req.params.id }
+    })
+        .then((nb) => res.status(200).json(nb))
+        .catch(error => res.status(400).json({ error }));
+};
+
+exports.getDislikesByPublication = (req, res, next) => {
+    let where = {};
+    Dislikes.count({
+        where: { publication_id: req.params.id }
+    })
+        .then((nb) => res.status(200).json(nb))
+        .catch(error => res.status(400).json({ error }));
+};
