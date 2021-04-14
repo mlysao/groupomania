@@ -12,7 +12,6 @@ router.post('/', auth, multer, publicationCtrl.createPublication);
 router.put('/:id', auth, multer, publicationMiddleWare.publicationFindById, publicationMiddleWare.canUpdatePublication, publicationCtrl.modifyPublication);
 router.delete('/:id', auth, publicationMiddleWare.publicationFindById, publicationMiddleWare.canDeletePublication, publicationCtrl.deletePublication);
 router.post('/:id/like', auth, publicationMiddleWare.publicationFindById, publicationMiddleWare.canLikePublication, publicationCtrl.likePublication);
-router.get('/:id/like', auth, publicationMiddleWare.publicationFindById, publicationCtrl.getLikesByPublication);
-router.get('/:id/dislike', auth, publicationMiddleWare.publicationFindById, publicationCtrl.getDislikesByPublication);
+router.get('/:id/like', auth, publicationMiddleWare.publicationFindById, publicationCtrl.getLikePublication);
 
 module.exports = router;
