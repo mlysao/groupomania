@@ -14,10 +14,10 @@ exports.signup = (req, res, next) => {
             password: bcrypt.hashSync(req.body.password, 10),
             image_url: file
         })
-            .then(() => res.status(201).json({message: 'Utilisateur créé !'}))
+            .then(() => res.status(201).json({error: 'Utilisateur créé !'}))
             .catch(error => res.status(400).json({error}));
     } else {
-        return res.status(400).json({message: 'Le mot de passe doit faire au moins 8 caractères !'});
+        return res.status(400).json({error: 'Le mot de passe doit faire au moins 8 caractères !'});
     }
 };
 
