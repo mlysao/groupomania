@@ -6,4 +6,5 @@
 - Créer un .env à partir de env.example  
 - Exécuter le backend:
 > nodemon start
+- Via l'application, se connecter en utilisant le compte moderateur@groupomania.fr/123456789
 
